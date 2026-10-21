@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "MINI ERP API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:3000/api" }],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const d = pm.response.json();",
+              "if (d.token) { pm.collectionVariables.set('token', d.token); }"
+            ] }
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"admin\",\n  \"password\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        { "name": "GET productos", "request": { "method": "GET", "url": "{{baseUrl}}/productos" } },
+        { "name": "GET productos (filtro, búsqueda, paginación, orden)", "request": { "method": "GET", "url": "{{baseUrl}}/productos?categoria=Computación&buscar=laptop&page=1&limit=10&sort=precio&order=desc" } },
+        { "name": "GET producto 1", "request": { "method": "GET", "url": "{{baseUrl}}/productos/1" } },
+        {
+          "name": "POST producto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Monitor LG\",\n  \"codigo\": \"PROD004\",\n  \"precio\": 3500,\n  \"stock\": 8,\n  \"categoria\": \"Computación\"\n}" },
+            "url": "{{baseUrl}}/productos"
+          }
+        },
+        {
+          "name": "POST producto (error de validación)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"\",\n  \"codigo\": \"X1\",\n  \"precio\": -5,\n  \"stock\": 3\n}" },
+            "url": "{{baseUrl}}/productos"
+          }
+        },
+        {
+          "name": "PUT producto 1",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Laptop Lenovo\",\n  \"codigo\": \"PROD001\",\n  \"precio\": 12500,\n  \"stock\": 10,\n  \"categoria\": \"Computación\"\n}" },
+            "url": "{{baseUrl}}/productos/1"
+          }
+        },
+        { "name": "DELETE producto 1", "request": { "method": "DELETE", "url": "{{baseUrl}}/productos/1" } }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        { "name": "GET clientes", "request": { "method": "GET", "url": "{{baseUrl}}/clientes" } },
+        {
+          "name": "POST cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Comercial XYZ SA de CV\",\n  \"rfc\": \"XYZ030303AB1\",\n  \"telefono\": \"5512345678\",\n  \"correo\": \"ventas@xyz.com\"\n}" },
+            "url": "{{baseUrl}}/clientes"
+          }
+        },
+        {
+          "name": "PUT cliente 1",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Empresa ABC SA de CV\",\n  \"rfc\": \"ABC010101XXX\",\n  \"telefono\": \"5555555555\",\n  \"correo\": \"nuevo@empresa.com\"\n}" },
+            "url": "{{baseUrl}}/clientes/1"
+          }
+        },
+        { "name": "DELETE cliente 1", "request": { "method": "DELETE", "url": "{{baseUrl}}/clientes/1" } }
+      ]
+    },
+    {
+      "name": "Proveedores",
+      "item": [
+        { "name": "GET proveedores", "request": { "method": "GET", "url": "{{baseUrl}}/proveedores" } }
+      ]
+    },
+    {
+      "name": "Ventas",
+      "item": [
+        { "name": "GET ventas", "request": { "method": "GET", "url": "{{baseUrl}}/ventas" } },
+        { "name": "GET venta 1", "request": { "method": "GET", "url": "{{baseUrl}}/ventas/1" } },
+        {
+          "name": "POST venta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"clienteId\": 1,\n  \"fecha\": \"2026-10-20\",\n  \"productos\": [\n    { \"productoId\": 2, \"cantidad\": 3 }\n  ]\n}" },
+            "url": "{{baseUrl}}/ventas"
+          }
+        },
+        {
+          "name": "POST venta (stock insuficiente)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"clienteId\": 1,\n  \"productos\": [\n    { \"productoId\": 3, \"cantidad\": 999 }\n  ]\n}" },
+            "url": "{{baseUrl}}/ventas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compras",
+      "item": [
+        { "name": "GET compras", "request": { "method": "GET", "url": "{{baseUrl}}/compras" } },
+        {
+          "name": "POST compra",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"proveedorId\": 1,\n  \"fecha\": \"2026-10-20\",\n  \"productos\": [\n    { \"productoId\": 3, \"cantidad\": 20, \"precio\": 600 }\n  ]\n}" },
+            "url": "{{baseUrl}}/compras"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventario y Dashboard",
+      "item": [
+        { "name": "GET inventario", "request": { "method": "GET", "url": "{{baseUrl}}/inventario" } },
+        { "name": "GET inventario (stock bajo)", "request": { "method": "GET", "url": "{{baseUrl}}/inventario?stockBajo=true" } },
+        { "name": "GET dashboard", "request": { "method": "GET", "url": "{{baseUrl}}/dashboard" } }
+      ]
+    }
+  ]
+}
