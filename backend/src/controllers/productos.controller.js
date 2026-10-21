@@ -8,8 +8,17 @@ const noEncontrado = (res) =>
 
 const listar = async (req, res, next) => {
   try {
-    const data = await service.obtenerTodos();
-    res.status(200).json({ success: true, data });
+    const { rows, total, page, limit } = await service.obtenerTodos(req.query);
+    res.status(200).json({
+      success: true,
+      data: rows,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (err) { next(err); }
 };
 

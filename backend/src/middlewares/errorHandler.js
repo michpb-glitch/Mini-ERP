@@ -1,4 +1,9 @@
 module.exports = (err, req, res, next) => {
+  // Errores controlados lanzados desde los services
+  if (err.status && err.body) {
+    return res.status(err.status).json(err.body);
+  }
+
   console.error(err);
 
   if (err.code === 'ER_DUP_ENTRY') {

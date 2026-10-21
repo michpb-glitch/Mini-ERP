@@ -1,10 +1,12 @@
 const router = require('express').Router();
 const c = require('../controllers/productos.controller');
+const validarProducto = require('../middlewares/validarProducto');
+const { soloAdmin } = require('../middlewares/auth');
 
 router.get('/', c.listar);
 router.get('/:id', c.obtener);
-router.post('/', c.crear);
-router.put('/:id', c.actualizar);
-router.delete('/:id', c.eliminar);
+router.post('/', validarProducto, c.crear);
+router.put('/:id', validarProducto, c.actualizar);
+router.delete('/:id', soloAdmin, c.eliminar);
 
 module.exports = router;

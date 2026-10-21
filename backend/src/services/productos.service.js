@@ -1,8 +1,39 @@
 const db = require('../config/db');
 
-const obtenerTodos = async () => {
-  const [rows] = await db.query('SELECT * FROM productos ORDER BY id');
-  return rows;
+const COLUMNAS_ORDEN = ['id', 'nombre', 'codigo', 'precio', 'stock', 'categoria'];
+
+const obtenerTodos = async ({ categoria, buscar, page = 1, limit = 10, sort = 'id', order = 'asc' }) => {
+  const where = [];
+  const params = [];
+
+  if (categoria) {
+    where.push('categoria = ?');
+    params.push(categoria);
+  }
+  if (buscar) {
+    where.push('(nombre LIKE ? OR codigo LIKE ?)');
+    params.push(`%${buscar}%`, `%${buscar}%`);
+  }
+
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+  const columna = COLUMNAS_ORDEN.includes(sort) ? sort : 'id';
+  const direccion = String(order).toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+
+  const pagina = Math.max(parseInt(page) || 1, 1);
+  const limite = Math.min(Math.max(parseInt(limit) || 10, 1), 100);
+  const offset = (pagina - 1) * limite;
+
+  const [[{ total }]] = await db.query(
+    `SELECT COUNT(*) AS total FROM productos ${whereSql}`,
+    params
+  );
+
+  const [rows] = await db.query(
+    `SELECT * FROM productos ${whereSql} ORDER BY ${columna} ${direccion} LIMIT ? OFFSET ?`,
+    [...params, limite, offset]
+  );
+
+  return { rows, total, page: pagina, limit: limite };
 };
 
 const obtenerPorId = async (id) => {
